@@ -1,13 +1,9 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import http from "http";
 import app from "./app";
-
-const PORT = Number(process.env.PORT) || 5000;
+import { env } from "./config/env";
 
 const httpServer = http.createServer(app);
 
-httpServer.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT} 🚀`);
+httpServer.listen(env.port, () => {
+  console.log(`Server is running on http://localhost:${env.port} 🚀`);
 });
