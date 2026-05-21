@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import {
   createContext,
+  type Dispatch,
   type ReactNode,
   useContext,
   useMemo,
@@ -17,7 +18,7 @@ interface ChatContextValue {
   rooms: RoomSummary[];
   setRooms: (rooms: RoomSummary[]) => void;
   messages: Message[];
-  setMessages: (messages: Message[]) => void;
+  setMessages: Dispatch<React.SetStateAction<Message[]>>;
   roomUsers: string[];
   setRoomUsers: (users: string[]) => void;
 }
