@@ -10,6 +10,8 @@ import {
 
 import type { Message, RoomSummary } from "../types/chat.types";
 
+import { useLocalStorage } from "../hooks/useLocalStorage";
+
 interface ChatContextValue {
   username: string;
   setUsername: (username: string) => void;
@@ -30,7 +32,7 @@ interface ChatProviderProps {
 }
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useLocalStorage("chat_username", "");
   const [currentRoom, setCurrentRoom] = useState("");
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);

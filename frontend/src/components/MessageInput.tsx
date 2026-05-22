@@ -27,7 +27,7 @@ const MessageInput = ({ onSendMessage, disabled }: MessageInputProps) => {
       onSubmit={handleSubmit}
       className="border-t border-slate-800 p-4 bg-slate-900"
     >
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           placeholder="Type your message..."
@@ -40,7 +40,7 @@ const MessageInput = ({ onSendMessage, disabled }: MessageInputProps) => {
         <button
           type="submit"
           disabled={disabled}
-          className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 transition rounded-lg px-6 py-3 font-semibold cursor-pointer"
+          className="bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 transition rounded-lg px-6 py-3 font-semibold cursor-pointer w-full sm:w-auto"
         >
           Send
         </button>

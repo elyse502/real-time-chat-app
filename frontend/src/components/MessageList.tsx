@@ -19,7 +19,7 @@ const MessageList = ({ messages, currentUsername }: MessageListProps) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 space-y-4">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">
       {messages.map((message) => {
         if (message.type === "system") {
           return <SystemMessage key={message.id} content={message.content} />;

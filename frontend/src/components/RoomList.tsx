@@ -8,7 +8,7 @@ interface RoomListProps {
 
 const RoomList = ({ rooms, currentRoom, onJoinRoom }: RoomListProps) => {
   return (
-    <aside className="w-full md:w-72 bg-slate-900 border-r border-slate-800 p-4">
+    <aside className="w-full md:w-72 bg-slate-900 border-r border-slate-800 p-4 overflow-y-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold">Chat Rooms</h2>
 
