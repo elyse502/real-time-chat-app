@@ -8,6 +8,7 @@ export const DEFAULT_ROOMS = [
 export const SOCKET_EVENTS = {
   CONNECTION: "connection",
   DISCONNECT: "disconnect",
+  ERROR: "error",
   GET_ROOMS: "get_rooms",
   ROOMS_LIST: "rooms_list",
   JOIN_ROOM: "join_room",

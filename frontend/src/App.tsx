@@ -26,6 +26,8 @@ import type {
   RoomUsersPayload,
 } from "./types/chat.types";
 
+import toast from "react-hot-toast";
+
 function App() {
   useSocket();
 
@@ -91,6 +93,10 @@ function App() {
       ]);
     });
 
+    socket.on(SOCKET_EVENTS.ERROR, (payload: { message: string }) => {
+      toast.error(payload.message);
+    });
+
     return () => {
       socket.off(SOCKET_EVENTS.ROOMS_LIST);
       socket.off(SOCKET_EVENTS.MESSAGE_HISTORY);
@@ -98,6 +104,7 @@ function App() {
       socket.off(SOCKET_EVENTS.ROOM_USERS);
       socket.off(SOCKET_EVENTS.USER_JOINED);
       socket.off(SOCKET_EVENTS.USER_LEFT);
+      socket.off(SOCKET_EVENTS.ERROR);
     };
   }, [currentRoom, setMessages, setRoomUsers, setRooms]);
 
@@ -124,6 +131,10 @@ function App() {
 
   const handleSendMessage = (content: string) => {
     if (!currentRoom) {
+      return;
+    }
+
+    if (!content.trim()) {
       return;
     }
 

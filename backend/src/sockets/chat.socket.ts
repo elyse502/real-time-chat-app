@@ -3,6 +3,7 @@ import { SOCKET_EVENTS } from "../config/constants";
 import { messageService } from "../services/message.service";
 import { roomService } from "../services/room.service";
 import { JoinRoomPayload, SendMessagePayload } from "../models/chat.model";
+import { isValidString } from "../utils/validators";
 
 const emitRooms = (io: Server): void => {
   io.emit(SOCKET_EVENTS.ROOMS_LIST, roomService.getRooms());
@@ -26,11 +27,19 @@ const registerJoinRoomHandler = (io: Server, socket: Socket): void => {
     const username = payload.username.trim();
     const room = payload.room.trim();
 
-    if (!username || !room) {
+    if (!isValidString(username, 3, 20)) {
+      socket.emit(SOCKET_EVENTS.ERROR, {
+        message: "Username must be between 3 and 20 characters",
+      });
+
       return;
     }
 
     if (!roomService.roomExists(room)) {
+      socket.emit(SOCKET_EVENTS.ERROR, {
+        message: "Selected room does not exist",
+      });
+
       return;
     }
 
@@ -71,7 +80,11 @@ const registerSendMessageHandler = (io: Server, socket: Socket): void => {
 
     const content = payload.content.trim();
 
-    if (!content) {
+    if (!isValidString(content, 1, 500)) {
+      socket.emit(SOCKET_EVENTS.ERROR, {
+        message: "Message must be between 1 and 500 characters",
+      });
+
       return;
     }
 
