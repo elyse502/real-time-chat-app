@@ -5,6 +5,7 @@ import MessageInput from "./components/MessageInput";
 import MessageList from "./components/MessageList";
 import RoomList from "./components/RoomList";
 import UsernameForm from "./components/UsernameForm";
+import ConnectionStatus from "./components/ConnectionStatus";
 
 import ChatLayout from "./layouts/ChatLayout";
 
@@ -15,6 +16,8 @@ import { socket } from "./services/socket";
 import { SOCKET_EVENTS } from "./constants/socket-events";
 
 import { useChatContext } from "./context/chat.context";
+
+import { generateId } from "./utils/generate-id";
 
 import type {
   JoinRoomPayload,
@@ -60,11 +63,41 @@ function App() {
       }
     });
 
+    socket.on(SOCKET_EVENTS.USER_JOINED, (payload: { username: string }) => {
+      setMessages((previousMessages) => [
+        ...previousMessages,
+        {
+          id: generateId(),
+          room: currentRoom,
+          sender: "system",
+          content: `${payload.username} joined the room`,
+          timestamp: new Date().toISOString(),
+          type: "system",
+        },
+      ]);
+    });
+
+    socket.on(SOCKET_EVENTS.USER_LEFT, (payload: { username: string }) => {
+      setMessages((previousMessages) => [
+        ...previousMessages,
+        {
+          id: generateId(),
+          room: currentRoom,
+          sender: "system",
+          content: `${payload.username} left the room`,
+          timestamp: new Date().toISOString(),
+          type: "system",
+        },
+      ]);
+    });
+
     return () => {
       socket.off(SOCKET_EVENTS.ROOMS_LIST);
       socket.off(SOCKET_EVENTS.MESSAGE_HISTORY);
       socket.off(SOCKET_EVENTS.RECEIVE_MESSAGE);
       socket.off(SOCKET_EVENTS.ROOM_USERS);
+      socket.off(SOCKET_EVENTS.USER_JOINED);
+      socket.off(SOCKET_EVENTS.USER_LEFT);
     };
   }, [currentRoom, setMessages, setRoomUsers, setRooms]);
 
@@ -82,6 +115,8 @@ function App() {
       room,
     };
 
+    setMessages([]);
+    setRoomUsers([]);
     setCurrentRoom(room);
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, payload);
@@ -114,6 +149,8 @@ function App() {
       }
     >
       <ChatHeader room={currentRoom} users={roomUsers} />
+
+      <ConnectionStatus />
 
       {!currentRoom ? (
         <div className="flex-1 flex items-center justify-center p-6">

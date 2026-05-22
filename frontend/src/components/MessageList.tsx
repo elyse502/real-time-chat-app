@@ -1,3 +1,7 @@
+import { useEffect, useRef } from "react";
+
+import SystemMessage from "./SystemMessage";
+
 import { type Message } from "../types/chat.types";
 
 interface MessageListProps {
@@ -6,9 +10,21 @@ interface MessageListProps {
 }
 
 const MessageList = ({ messages, currentUsername }: MessageListProps) => {
+  const bottomRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   return (
     <div className="flex-1 overflow-y-auto p-6 space-y-4">
       {messages.map((message) => {
+        if (message.type === "system") {
+          return <SystemMessage key={message.id} content={message.content} />;
+        }
+
         const isCurrentUser = message.sender === currentUsername;
 
         return (
@@ -31,11 +47,13 @@ const MessageList = ({ messages, currentUsername }: MessageListProps) => {
                 </span>
               </div>
 
-              <p className="break-words">{message.content}</p>
+              <p className="wrap-break-word">{message.content}</p>
             </div>
           </div>
         );
       })}
+
+      <div ref={bottomRef} />
     </div>
   );
 };

@@ -3,7 +3,7 @@ import { generateId } from "../utils/generate-id";
 import { getTimestamp } from "../utils/get-timestamp";
 
 class MessageService {
-  private messages: Map<string, Message[]> = new Map();
+  private readonly messages: Map<string, Message[]> = new Map();
 
   public getMessagesByRoom(room: string): Message[] {
     return this.messages.get(room) || [];
@@ -16,6 +16,7 @@ class MessageService {
       sender: payload.sender.trim(),
       content: payload.content.trim(),
       timestamp: getTimestamp(),
+      type: "user",
     };
 
     const existingMessages = this.getMessagesByRoom(payload.room);
