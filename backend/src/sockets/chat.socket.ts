@@ -98,6 +98,34 @@ const registerSendMessageHandler = (io: Server, socket: Socket): void => {
   });
 };
 
+const registerTypingHandlers = (socket: Socket): void => {
+  socket.on(SOCKET_EVENTS.START_TYPING, () => {
+    const user = roomService.getUser(socket.id);
+
+    if (!user) {
+      return;
+    }
+
+    socket.to(user.room).emit(SOCKET_EVENTS.USER_TYPING, {
+      username: user.username,
+      isTyping: true,
+    });
+  });
+
+  socket.on(SOCKET_EVENTS.STOP_TYPING, () => {
+    const user = roomService.getUser(socket.id);
+
+    if (!user) {
+      return;
+    }
+
+    socket.to(user.room).emit(SOCKET_EVENTS.USER_TYPING, {
+      username: user.username,
+      isTyping: false,
+    });
+  });
+};
+
 const registerDisconnectHandler = (io: Server, socket: Socket): void => {
   socket.on(SOCKET_EVENTS.DISCONNECT, () => {
     const user = roomService.removeUser(socket.id);
@@ -122,6 +150,7 @@ export const registerChatSocket = (io: Server): void => {
     registerGetRoomsHandler(socket);
     registerJoinRoomHandler(io, socket);
     registerSendMessageHandler(io, socket);
+    registerTypingHandlers(socket);
     registerDisconnectHandler(io, socket);
   });
 };

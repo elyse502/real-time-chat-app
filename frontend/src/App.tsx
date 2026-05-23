@@ -19,6 +19,8 @@ import { useChatContext } from "./context/chat.context";
 
 import { generateId } from "./utils/generate-id";
 
+import TypingIndicator from "./components/TypingIndicator";
+
 import type {
   JoinRoomPayload,
   Message,
@@ -42,6 +44,8 @@ function App() {
     setMessages,
     roomUsers,
     setRoomUsers,
+    typingUsers,
+    setTypingUsers,
   } = useChatContext();
 
   useEffect(() => {
@@ -97,6 +101,23 @@ function App() {
       toast.error(payload.message);
     });
 
+    socket.on(
+      SOCKET_EVENTS.USER_TYPING,
+      (payload: { username: string; isTyping: boolean }) => {
+        setTypingUsers((previousUsers) => {
+          if (payload.isTyping) {
+            if (previousUsers.includes(payload.username)) {
+              return previousUsers;
+            }
+
+            return [...previousUsers, payload.username];
+          }
+
+          return previousUsers.filter((user) => user !== payload.username);
+        });
+      },
+    );
+
     return () => {
       socket.off(SOCKET_EVENTS.ROOMS_LIST);
       socket.off(SOCKET_EVENTS.MESSAGE_HISTORY);
@@ -105,8 +126,9 @@ function App() {
       socket.off(SOCKET_EVENTS.USER_JOINED);
       socket.off(SOCKET_EVENTS.USER_LEFT);
       socket.off(SOCKET_EVENTS.ERROR);
+      socket.off(SOCKET_EVENTS.USER_TYPING);
     };
-  }, [currentRoom, setMessages, setRoomUsers, setRooms]);
+  }, [currentRoom, setMessages, setRoomUsers, setRooms, setTypingUsers]);
 
   const handleSetUsername = (enteredUsername: string) => {
     setUsername(enteredUsername);
@@ -145,6 +167,14 @@ function App() {
     });
   };
 
+  const handleTyping = () => {
+    socket.emit(SOCKET_EVENTS.START_TYPING);
+  };
+
+  const handleStopTyping = () => {
+    socket.emit(SOCKET_EVENTS.STOP_TYPING);
+  };
+
   if (!username) {
     return <UsernameForm onSubmit={handleSetUsername} />;
   }
@@ -175,8 +205,12 @@ function App() {
         <>
           <MessageList messages={messages} currentUsername={username} />
 
+          <TypingIndicator users={typingUsers} />
+
           <MessageInput
             onSendMessage={handleSendMessage}
+            onTyping={handleTyping}
+            onStopTyping={handleStopTyping}
             disabled={!currentRoom}
           />
         </>

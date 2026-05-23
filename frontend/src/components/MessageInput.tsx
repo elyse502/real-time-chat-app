@@ -1,12 +1,22 @@
-import { type FormEvent, useState } from "react";
+import { type FormEvent, useRef, useState } from "react";
 
 interface MessageInputProps {
   onSendMessage: (message: string) => void;
+  onTyping: () => void;
+  onStopTyping: () => void;
   disabled: boolean;
 }
 
-const MessageInput = ({ onSendMessage, disabled }: MessageInputProps) => {
+const MessageInput = ({
+  onSendMessage,
+  onTyping,
+  onStopTyping,
+  disabled,
+}: MessageInputProps) => {
   const [message, setMessage] = useState("");
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(
+    undefined,
+  );
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -20,6 +30,22 @@ const MessageInput = ({ onSendMessage, disabled }: MessageInputProps) => {
     onSendMessage(trimmedMessage);
 
     setMessage("");
+
+    onStopTyping();
+  };
+
+  const handleTyping = (value: string) => {
+    setMessage(value);
+
+    onTyping();
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      onStopTyping();
+    }, 1000);
   };
 
   return (
@@ -33,7 +59,7 @@ const MessageInput = ({ onSendMessage, disabled }: MessageInputProps) => {
           placeholder="Type your message..."
           value={message}
           disabled={disabled}
-          onChange={(event) => setMessage(event.target.value)}
+          onChange={(event) => handleTyping(event.target.value)}
           className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 outline-none"
         />
 

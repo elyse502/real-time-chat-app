@@ -23,6 +23,8 @@ interface ChatContextValue {
   setMessages: Dispatch<React.SetStateAction<Message[]>>;
   roomUsers: string[];
   setRoomUsers: (users: string[]) => void;
+  typingUsers: string[];
+  setTypingUsers: Dispatch<React.SetStateAction<string[]>>;
 }
 
 const ChatContext = createContext<ChatContextValue | undefined>(undefined);
@@ -33,6 +35,7 @@ interface ChatProviderProps {
 
 export const ChatProvider = ({ children }: ChatProviderProps) => {
   const [username, setUsername] = useLocalStorage("chat_username", "");
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const [currentRoom, setCurrentRoom] = useState("");
   const [rooms, setRooms] = useState<RoomSummary[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -50,8 +53,18 @@ export const ChatProvider = ({ children }: ChatProviderProps) => {
       setMessages,
       roomUsers,
       setRoomUsers,
+      typingUsers,
+      setTypingUsers,
     }),
-    [username, currentRoom, rooms, messages, roomUsers],
+    [
+      username,
+      currentRoom,
+      rooms,
+      messages,
+      roomUsers,
+      typingUsers,
+      setUsername,
+    ],
   );
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
