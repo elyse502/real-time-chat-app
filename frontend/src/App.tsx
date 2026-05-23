@@ -149,6 +149,8 @@ function App() {
     setCurrentRoom(room);
 
     socket.emit(SOCKET_EVENTS.JOIN_ROOM, payload);
+
+    toast.success(`Joined ${room}`);
   };
 
   const handleSendMessage = (content: string) => {
